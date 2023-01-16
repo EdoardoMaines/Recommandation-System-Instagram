@@ -1,2 +1,2 @@
-# Recommandation-System-Instagram-
+# Recommandation-System-Instagram
 DataMining project for University
