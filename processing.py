@@ -109,9 +109,9 @@ with open("raw_hashtags.csv") as f:
                 #print(c)
 print("tags \n",tags[0])
 #for i in range(len(all_data[0])):
-print(len(query_user[1774]))
+print(len(query_user[1762]))
 
-que = query_user[1774]
+que = query_user[1762]
 ind = []
 for i in range(1,len(que)):
     query_spl = str.split(que[i],"=")
@@ -144,7 +144,7 @@ for j in relational_table: #this works only on the hashtag vector and not on the
             #print("bene\n",c)
         if(c == len(ind)-1):
             query_result.append(j)
-print("query result:\n",query_result)
+print("query result:\n",len(query_result))
         
         #print("that'it:",i+2)
         
