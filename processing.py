@@ -118,14 +118,14 @@ for i in range(1,len(que)):
     for j in range(0, len(query_spl)-1,2):
         #print("\ncheck:", query_spl[0])
         if "content_creator_ID " == query_spl[0]:
-            print("FORSE",query_spl[0])
+            print("Creator id is present in the query",query_spl[0])
             
 
             for k in range(0,len(relational_table)):
                 #print("\n",relational_table[k][1])
                 #print(relational_table[k][1])
                 if (" "+relational_table[k][1]) == query_spl[1]:
-                    print("\nFATTA FACCIAMO UNA CANNA")
+                    print("\n")
         if query_spl[0] != "content_creator_ID ":
             for k in range(0,len(relational_table[0])):
                 if(query_spl[0] == (relational_table[0][k]+" ")):
@@ -138,12 +138,15 @@ for j in relational_table: #this works only on the hashtag vector and not on the
     c = 0
     print(j)
     for i,o in ind:
-        print(j[i],i)
-        if (j[i] == o):
+        print(j[i],o)
+        if(" "+j[i] == (o)):
             c += 1
             #print("bene\n",c)
-        if(c == len(ind)-1):
+        if(c == len(ind)):
+            print("dio porco")
             query_result.append(j)
+
+
 print("query result:\n",len(query_result))
         
         #print("that'it:",i+2)
