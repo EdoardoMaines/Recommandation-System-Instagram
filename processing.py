@@ -72,8 +72,8 @@ with open("Relational_table.csv", "r") as q:
         relational_table.append(row)
         
 q.close()
-ecc = get_query_result("user_0129",all_data,relational_table,query_set)
-print("ecco\n",ecc[3])
+query_user = get_query_result("user_0129",all_data,relational_table,query_set)
+print("ecco\n",query_user[1873])
 # for i in ecc:
 
 #     print("ecco\n",i)
@@ -109,3 +109,42 @@ with open("raw_hashtags.csv") as f:
                 #print(c)
 print("tags \n",tags[0])
 #for i in range(len(all_data[0])):
+print(len(query_user[1774]))
+
+que = query_user[1774]
+ind = []
+for i in range(1,len(que)):
+    query_spl = str.split(que[i],"=")
+    for j in range(0, len(query_spl)-1,2):
+        #print("\ncheck:", query_spl[0])
+        if "content_creator_ID " == query_spl[0]:
+            print("FORSE",query_spl[0])
+            
+
+            for k in range(0,len(relational_table)):
+                #print("\n",relational_table[k][1])
+                #print(relational_table[k][1])
+                if (" "+relational_table[k][1]) == query_spl[1]:
+                    print("\nFATTA FACCIAMO UNA CANNA")
+        if query_spl[0] != "content_creator_ID ":
+            for k in range(0,len(relational_table[0])):
+                if(query_spl[0] == (relational_table[0][k]+" ")):
+                    print("\nFUCK Motherfucker")
+                    print("\n numero = ",k)
+                    ind.append((k,query_spl[1]))
+print(ind)
+query_result = []
+for j in relational_table: #this works only on the hashtag vector and not on the content creaqtor id
+    c = 0
+    print(j)
+    for i,o in ind:
+        print(j[i],i)
+        if (j[i] == o):
+            c += 1
+            #print("bene\n",c)
+        if(c == len(ind)-1):
+            query_result.append(j)
+print("query result:\n",query_result)
+        
+        #print("that'it:",i+2)
+        
