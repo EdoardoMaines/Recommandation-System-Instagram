@@ -118,7 +118,6 @@ for i in range(0, len(query_set)):
                     ind.append((k,query_spl[1]))
     #print(ind)
     query_result = []
-
     # this works only on the hashtag vector and not on the content creator id
     # now we want to read every rows in the relational table (posts)
 
@@ -149,7 +148,7 @@ for i in range(0, len(query_set)):
     if len(query_result) == 0:
         print("\nLa query ", query_ID, " non da nessun risultato")
 
-
+    print("results of the query: ",len(query_result))
     #print("query result:\n",len(query_result))
     queries_results[query_ID] = query_result
 
