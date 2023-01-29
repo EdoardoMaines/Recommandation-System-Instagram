@@ -157,7 +157,7 @@ frequency_vector = []
 #s = retrieve_batch(0)
 #print(s)
 #query_set_user = all_data["user_0145"]
-query_log_user = list(all_data["user_0069"])
+query_log_user = list(all_data["user_0234"])
 
 print("aaaaaaaaal dataaaaaaaa\n",len(query_log_user))
 
@@ -183,6 +183,8 @@ for i in range(0,len(query_log_user)):
 
     #print("retrieved query \n",retrieved_query)
     query_result = retrieve_batch(retrieved_query,query_set) #take as input the index of the query_set
+    #print("CIAO")
+    #print(query_result[:5])
     #query_result = batch_of_post(retrieved_query)
     #print(query_result[0])
     #print("query result len: ",query_result,"\n")
@@ -197,8 +199,8 @@ for i in range(0,len(query_log_user)):
     if(len(query_result) == 0): 
         empty_result.append(1)
 print("\nretrieved percentage = ",len(retrievd_percentage))
-print(len(list[0]))
-print(frequency_vector[-1])
+#print(len(list[0]))
+#print(frequency_vector[-1])
 print("empty result ",len(empty_result))
 print("non empty ", len(list))
 print("tot ", len(list_tot))
@@ -254,6 +256,7 @@ def distance_from_centroid(frequency_vect,centroid):
 
     return dist
 
+print("VALORE", retrievd_percentage[-1])
 dist1 = distance_from_centroid(frequency_vector_scld[-1],km.cluster_centers_[0])
 dist2 = distance_from_centroid(frequency_vector_scld[-1],km.cluster_centers_[1])
 dist3 = distance_from_centroid(frequency_vector_scld[-1],km.cluster_centers_[2])
@@ -262,8 +265,9 @@ print("\ndistanza: ",dist1,"_",dist2,"_",dist3)
 
 for i in range(km.n_clusters):
     c,ci,cz = 0,0,0
+
     percentage_cluster1,percentage_cluster2,percentage_cluster3 = 0,0,0
-    for i in range(0,len(frequency_vector_scld)-1):
+    for i in range(0,len(frequency_vector_scld)):
         prediction = km.predict([frequency_vector_scld[i]])
         perc = retrievd_percentage[i]
         if prediction == 0:
@@ -275,9 +279,11 @@ for i in range(km.n_clusters):
         if prediction == 2:
             cz += 1
             percentage_cluster3 += float(perc)
+if c != 0 and ci != 0 and cz != 0:
+
     percentage_cluster1 = percentage_cluster1/c
     percentage_cluster2 = percentage_cluster2/ci
     percentage_cluster3 = percentage_cluster3/cz
-
-    print("IIIIIIIIIIIIIIIIII",c,"__",ci,"__",cz)
-    print("with percentage like = ",percentage_cluster1,"__",percentage_cluster2,"__",percentage_cluster3)
+    
+print("IIIIIIIIIIIIIIIIII",c,"__",ci,"__",cz)
+print("with percentage like = ",percentage_cluster1,"__",percentage_cluster2,"__",percentage_cluster3)

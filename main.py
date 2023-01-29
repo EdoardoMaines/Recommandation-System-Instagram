@@ -1,6 +1,7 @@
 import os
 import csv
 import numpy as np
+import random
 
 # \start 
 # FUNCTIONS
@@ -9,7 +10,7 @@ def random_hashtag_values():
     one = 1
     zero = 0
     a = np.random.normal(loc=0.0, scale=1.0, size=None)
-    if(a>1):
+    if(a>0.5):
         return one
     else:
         return zero
@@ -43,7 +44,7 @@ def create_query(attribute,names,n_query):
         for i in query_hash:
             q = str(attribute[i])+' = '+str(random_hashtag_values())
             query.append(q)
-        query.insert(0,'query_'+str(k).zfill(4))
+        query.insert(0,'query_'+str(k).zfill(5))
         query_set.append(query)
         #query.clear()
     return set(tuple(i) for i in query_set)
@@ -74,7 +75,113 @@ def create_query_log(users, queries):
 
         
     return user_queries
-    
+
+def create_query_log(users, queries_set,relational_table):
+
+    list_index_hashtags = []
+    for i in range(2, 398):
+        list_index_hashtags.append(i)
+
+    random.shuffle(list_index_hashtags)
+    user_queries = []
+
+    for user in users:        
+        lista1,lista2,lista3 = [],[],[]
+        lis1,lis2,lis3 = [],[],[]
+
+        # n_1 = np.random.randint(1,20)
+        # n_2 = np.random.randint(1,20)
+        # n_3 = np.random.randint(1,20)
+        n_1 = 132 
+        n_2 = 264
+        n_3 = 396
+        for j in range(0,n_1):
+            lista1.append(list_index_hashtags[j])
+        for j in range(n_1,n_2):
+            lista2.append(list_index_hashtags[j])
+        for j in range(n_2,n_3):
+            lista3.append(list_index_hashtags[j])
+            #lista3.append(np.random.randint(2,398))
+        # lista1 = set(lista1)
+        # lista2 = set(lista2)
+        # lista3 = set(lista3)
+        # inters = set.intersection(lista1,lista2,lista3)
+        # #print(inters)
+        # if len(inters) == 0:
+
+        for i in lista1:
+            lis1.append(relational_table[0][i])
+        for i in lista2:
+            lis2.append(relational_table[0][i])
+        for i in lista3:
+            lis3.append(relational_table[0][i])
+        #print("\nlis 1 chaaaaaarrrr:",lis1)
+        bella = 0
+        for i in queries_set:
+            count1 = 0
+            count2 = 0
+            count3 = 0
+            count = 0
+            query_ID = i[0]
+            perc = 0
+            perc1 = np.random.randint(80,101)
+            perc2 = np.random.randint(40,70)
+            perc3 = np.random.randint(5,30)
+
+            for t in range(1,len(i)):
+
+                canna = str.split(i[t]," = ")
+                #print("\n",[canna[0]])
+                if (canna[0] == "content_creator_ID"):
+                    bella += 1
+                else:
+                    if canna[0] in lis1 and canna[1]== "1":
+                        #print("\n",[canna[0]])
+                        count1 += 1
+                        count += 1
+                        
+                        #user_queries.append([user[0],query_ID,str(perc/100)])
+
+                    # elif count==n_1:
+                        perc = np.random.randint(85,101)
+                    #     user_queries.append([user[0],query_ID,str(perc/100)])
+
+                    if canna[0] in lis2  and canna[1]== "1":
+                        count2 += 1
+                        count += 1
+                        
+                    # elif count==(n_2):
+                        perc = np.random.randint(85,101)
+                    #     user_queries.append([user[0],query_ID,str(perc/100)])
+                    
+                    if canna[0] in lis3  and canna[1]== "1":
+                        count3 += 1
+                        count += 1
+                        
+                    # elif count==(n_3):
+                        perc = np.random.randint(85,101)
+                    #     user_queries.append([user[0],query_ID,str(perc/100)])
+            if count>=2:
+                #perc = ((count1*perc1)+(count2*perc2)+(count3*perc3))/(count1+count2+count3)
+                #perc = round(perc, 2)
+                user_queries.append([user[0],query_ID,str(perc/100)])
+
+            #print(count)
+
+    # num_queries = np.random.randint(100,300)
+    # np.random.shuffle(queries)
+    # for i in range(0, num_queries):
+    #     perc = np.random.randint(0,101)
+    #     user_queries.append([user[0],queries[i],str(perc/100)])
+    #     #lista1 = np.random
+    #     #if ( in lista1)
+        
+    #print("Ciao: ", len(ciao))
+            #print("1: ", count1, "2: ", count2, "3: ", count3)
+    else:(
+        print("Frate guarda che hanno intersezione")
+    )
+    return user_queries
 
 
 def extract_tags(path,tags):
@@ -127,11 +234,29 @@ print("NOME CASUALE: ", get_random_creator_ID(names))
 writer.writerow(attribute)
 f.close()
 
+
+relational_table = []
+
+with open("Relational_table.csv", "r") as q:
+    reader = csv.reader(q)
+    for row in reader:   
+        relational_table.append(row)
+        
+q.close()
+
+query_set = []
+with open("query_set.csv", "r") as q:
+    reader = csv.reader(q)
+    for row in reader:   
+        query_set.append(row)
+
+
+
 f = open('Relational_table.csv','a')
 writer = csv.writer(f)
 random_list_tags = []
 random_Cre_ID = []
-for j in range(1,4000):
+for j in range(1,10000):
     random_list_tags.clear()
     random_list_tags.append(str(j).zfill(4))
     #random_list_tags.append(names[j])
@@ -157,7 +282,7 @@ f.close()
 
 f = open('query_set.csv','w')
 writer = csv.writer(f)
-num_query = 5000
+num_query = 20000
 query = create_query(attribute,names,num_query)
 
 #print(query)
@@ -190,7 +315,8 @@ q.close()
 f = open('query_log.csv', 'w')
 writer = csv.writer(f)
 
-lista_bella = create_query_log(user_set, queries_id)
+lista_bella = create_query_log(user_set, query_set, relational_table)
+#lista_bella = create_query_log(user_set, queries_id)
 np.random.shuffle(lista_bella)
 
 for i in range(0,len(lista_bella)):
