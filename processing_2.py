@@ -157,7 +157,7 @@ frequency_vector = []
 #s = retrieve_batch(0)
 #print(s)
 #query_set_user = all_data["user_0145"]
-query_log_user = list(all_data["user_0234"])
+query_log_user = list(all_data["user_0017"])
 
 print("aaaaaaaaal dataaaaaaaa\n",len(query_log_user))
 
@@ -269,21 +269,30 @@ for i in range(km.n_clusters):
     percentage_cluster1,percentage_cluster2,percentage_cluster3 = 0,0,0
     for i in range(0,len(frequency_vector_scld)):
         prediction = km.predict([frequency_vector_scld[i]])
+
         perc = retrievd_percentage[i]
         if prediction == 0:
             c += 1
+            #print("\n0 percentuale:",perc)
             percentage_cluster1 += float(perc)
         if prediction == 1:
             ci += 1
             percentage_cluster2 += float(perc)
+            #print("\n1 percentuale:",perc)
+
         if prediction == 2:
             cz += 1
             percentage_cluster3 += float(perc)
+            #print("\n2 percentuale:",perc)
+
 if c != 0 and ci != 0 and cz != 0:
 
     percentage_cluster1 = percentage_cluster1/c
     percentage_cluster2 = percentage_cluster2/ci
     percentage_cluster3 = percentage_cluster3/cz
-    
-print("IIIIIIIIIIIIIIIIII",c,"__",ci,"__",cz)
-print("with percentage like = ",percentage_cluster1,"__",percentage_cluster2,"__",percentage_cluster3)
+    # percentage_cluster1 = percentage_cluster1/(percentage_cluster1+percentage_cluster2+percentage_cluster3)
+    # percentage_cluster2 = percentage_cluster2/(percentage_cluster1+percentage_cluster2+percentage_cluster3)
+    # percentage_cluster3 = percentage_cluster3/(percentage_cluster1+percentage_cluster2+percentage_cluster3)
+
+print("number of query per claster in user history: ",c,"__",ci,"__",cz)
+print("with liking percentage per cluster = ",percentage_cluster1,"__",percentage_cluster2,"__",percentage_cluster3)

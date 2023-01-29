@@ -124,9 +124,9 @@ def create_query_log(users, queries_set,relational_table):
             count = 0
             query_ID = i[0]
             perc = 0
-            perc1 = np.random.randint(80,101)
-            perc2 = np.random.randint(40,70)
-            perc3 = np.random.randint(5,30)
+            perc1 = 0
+            perc2 = 0
+            perc3 = 0
 
             for t in range(1,len(i)):
 
@@ -143,7 +143,8 @@ def create_query_log(users, queries_set,relational_table):
                         #user_queries.append([user[0],query_ID,str(perc/100)])
 
                     # elif count==n_1:
-                        perc = np.random.randint(85,101)
+                        perc = np.random.randint(80,101)
+                        perc1 += perc
                     #     user_queries.append([user[0],query_ID,str(perc/100)])
 
                     if canna[0] in lis2  and canna[1]== "1":
@@ -151,19 +152,24 @@ def create_query_log(users, queries_set,relational_table):
                         count += 1
                         
                     # elif count==(n_2):
-                        perc = np.random.randint(85,101)
+                        perc = np.random.randint(50,71)
                     #     user_queries.append([user[0],query_ID,str(perc/100)])
-                    
+                        perc2 += perc
+
                     if canna[0] in lis3  and canna[1]== "1":
                         count3 += 1
                         count += 1
                         
                     # elif count==(n_3):
-                        perc = np.random.randint(85,101)
+                        perc = np.random.randint(5,31)
                     #     user_queries.append([user[0],query_ID,str(perc/100)])
-            if count>=2:
+                        perc3 += perc
+                   
+            if count>=6:
                 #perc = ((count1*perc1)+(count2*perc2)+(count3*perc3))/(count1+count2+count3)
                 #perc = round(perc, 2)
+
+                perc = ((perc1*2.5)+(perc2*2)+(perc3*1.5))/((2.5*count1)+(2*count2)+(1.5*count3))
                 user_queries.append([user[0],query_ID,str(perc/100)])
 
             #print(count)
@@ -256,7 +262,7 @@ f = open('Relational_table.csv','a')
 writer = csv.writer(f)
 random_list_tags = []
 random_Cre_ID = []
-for j in range(1,10000):
+for j in range(1,20000):
     random_list_tags.clear()
     random_list_tags.append(str(j).zfill(4))
     #random_list_tags.append(names[j])
