@@ -3,10 +3,12 @@ import csv
 import numpy as np
 import random
 
+from tqdm import tqdm
+from processing_2 import retriev_query, retrieve_batch, sum_vector
 # \start 
 # FUNCTIONS
 
-def random_hashtag_values():
+def random_hashtag_values_():
     one = 1
     zero = 0
     a = np.random.normal(loc=0.0, scale=1.0, size=None)
@@ -15,9 +17,42 @@ def random_hashtag_values():
     else:
         return zero
 
+
+def random_hashtag_values(i,f,tt):
+    one = 1
+    zero = 0
+    if tt==1:
+        if i < f:
+            a = np.random.normal(loc=0.0, scale=1.0, size=None)
+            if(a>0.001):
+                return one
+            else:
+                return zero
+        if i>=f:
+            a = np.random.normal(loc=0.0, scale=1.0, size=None)
+            if(a>6):
+                return one
+            else:
+                return zero
+    else:
+        if i < f:
+            a = np.random.normal(loc=0.0, scale=1.0, size=None)
+            if(a>6):
+                return one
+            else:
+                return zero
+        if i>=f:
+            a = np.random.normal(loc=0.0, scale=1.0, size=None)
+            if(a>0.001):
+                return one
+            else:
+                return zero
+        
+
+
 def rnd_query():
-    query_len = np.random.randint(0,8)
-    name_len = np.random.randint(0,4)
+    query_len = np.random.randint(10,20)
+    name_len = np.random.randint(0,2)
     query = []
     query_name = []
     for j in range(name_len):
@@ -42,7 +77,7 @@ def create_query(attribute,names,n_query):
             q = str(attribute[1])+' = '+str(names[i])
             query.append(q)
         for i in query_hash:
-            q = str(attribute[i])+' = '+str(random_hashtag_values())
+            q = str(attribute[i])+' = '+str(random_hashtag_values_())
             query.append(q)
         query.insert(0,'query_'+str(k).zfill(5))
         query_set.append(query)
@@ -59,22 +94,65 @@ def create_user(n_user):
         #query.clear()
     return user_set
 
-def create_query_log(users, queries):
+# def create_query_log(users, queries):
 
     
-    user_queries = []
+#     user_queries = []
 
-    for user in users:        
+#     for user in users:        
         
-        num_queries = np.random.randint(100,300)
-        np.random.shuffle(queries)
-        for i in range(0, num_queries):
-            perc = np.random.randint(0,101)
-            user_queries.append([user[0],queries[i],str(perc/100)])
+#         num_queries = np.random.randint(100,300)
+#         np.random.shuffle(queries)
+#         for i in range(0, num_queries):
+#             perc = np.random.randint(0,101)
+#             user_queries.append([user[0],queries[i],str(perc/100)])
             
+def liking_percentage(freq_vector, l1, l2):
+    perc = 0
+    w1 = 3
+    w2 = 0.5
+    perc1,perc2 = 0,0
+    #print("1", freq_vector[1])
+    #print("0", freq_vector[0])
+    p = 0
+    n = 0
+    for j in l1:
+        perc1 += freq_vector[1][int(j)-2]
+        p += 1 
+    for h in l2:
+        perc2 += freq_vector[1][int(h)-2]
+        n += 1
+    perc = ((perc1*w1+perc2*w2)/(w1+w2))/(perc1+perc2)
+    # perc1 = perc1/p
+    # perc2 = perc2/n
+    
+    #print("\nqueste sono le altre percentuali : ",perc1,"___",perc2)
+    #print("\nperc1: ",perc1,"perc2: ",perc2)
+    id = freq_vector[0]
+    
 
+    return perc,id
+
+
+def from_query_to_frequency(queries):
+    list_tot = []
+    frequency_vector = []
+    list_ = []
+    for i in tqdm(range(len(queries))):
+        query_result = retrieve_batch(i,queries)
         
-    return user_queries
+        #print("QUERY RESULT:", len(query_result))
+        list_tot.append(query_result)
+        if len(query_result) != 0:
+            list_.append(query_result)
+            frequency_vector.append((queries[i][0],sum_vector(query_result)))
+
+    return frequency_vector
+
+
+
+
+#     return user_queries
 
 def create_query_log(users, queries_set,relational_table):
 
@@ -82,9 +160,16 @@ def create_query_log(users, queries_set,relational_table):
     for i in range(2, 398):
         list_index_hashtags.append(i)
 
-    random.shuffle(list_index_hashtags)
+    #random.shuffle(list_index_hashtags)
+    list_positive_index = list_index_hashtags[:190]
+    list_negative_index = list_index_hashtags[220:]
+    #random.shuffle(list_positive_index)
+    #random.shuffle(list_negative_index)
     user_queries = []
 
+    frequency_vector = from_query_to_frequency(queries_set)
+    #print(frequency_vector[:5])
+    dic_preferences = {}
     for user in users:        
         lista1,lista2,lista3 = [],[],[]
         lis1,lis2,lis3 = [],[],[]
@@ -95,13 +180,18 @@ def create_query_log(users, queries_set,relational_table):
         n_1 = 132 
         n_2 = 264
         n_3 = 396
-        for j in range(0,n_1):
-            lista1.append(list_index_hashtags[j])
-        for j in range(n_1,n_2):
-            lista2.append(list_index_hashtags[j])
-        for j in range(n_2,n_3):
-            lista3.append(list_index_hashtags[j])
+        for j in range(0,len(list_positive_index)-30):
+            lista1.append(list_positive_index[j])
+        for j in range(0,len(list_negative_index)-30):
+            lista3.append(list_negative_index[j])
             #lista3.append(np.random.randint(2,398))
+        
+        f = open("dict_preferences.csv","a")
+        writer = csv.writer(f)
+        dic_preferences = (user,lista1,lista3)
+
+        for i in range(len(dic_preferences)):
+            writer.writerow(dic_preferences[i])
         # lista1 = set(lista1)
         # lista2 = set(lista2)
         # lista3 = set(lista3)
@@ -111,66 +201,67 @@ def create_query_log(users, queries_set,relational_table):
 
         for i in lista1:
             lis1.append(relational_table[0][i])
-        for i in lista2:
-            lis2.append(relational_table[0][i])
         for i in lista3:
             lis3.append(relational_table[0][i])
         #print("\nlis 1 chaaaaaarrrr:",lis1)
-        bella = 0
-        for i in queries_set:
-            count1 = 0
-            count2 = 0
-            count3 = 0
-            count = 0
-            query_ID = i[0]
-            perc = 0
-            perc1 = 0
-            perc2 = 0
-            perc3 = 0
+        #bella = 0
+        for i in range(len(frequency_vector)):
+            perc, q_ID = liking_percentage(frequency_vector[i], lista1, lista3)
+            user_queries.append([user[0],q_ID,str(round(perc,2))])
 
-            for t in range(1,len(i)):
+        #     count1 = 0
+        #     count2 = 0
+        #     count3 = 0
+        #     count = 0
+        #     query_ID = i[0]
+        #     perc = 0
+        #     perc1 = 0
+        #     perc2 = 0
+        #     perc3 = 0
 
-                canna = str.split(i[t]," = ")
-                #print("\n",[canna[0]])
-                if (canna[0] == "content_creator_ID"):
-                    bella += 1
-                else:
-                    if canna[0] in lis1 and canna[1]== "1":
-                        #print("\n",[canna[0]])
-                        count1 += 1
-                        count += 1
+        #     for t in range(1,len(i)):
+
+        #         canna = str.split(i[t]," = ")
+        #         #print("\n",[canna[0]])
+        #         if (canna[0] == "content_creator_ID"):
+        #             bella += 1
+        #         else:
+        #             if canna[0] in lis1 and canna[1]== "1":
+        #                 #print("\n",[canna[0]])
+        #                 count1 += 1
+        #                 count += 1
                         
-                        #user_queries.append([user[0],query_ID,str(perc/100)])
+        #                 #user_queries.append([user[0],query_ID,str(perc/100)])
 
-                    # elif count==n_1:
-                        perc = np.random.randint(80,101)
-                        perc1 += perc
-                    #     user_queries.append([user[0],query_ID,str(perc/100)])
+        #             # elif count==n_1:
+        #                 perc = np.random.randint(80,101)
+        #                 perc1 += perc
+        #             #     user_queries.append([user[0],query_ID,str(perc/100)])
 
-                    if canna[0] in lis2  and canna[1]== "1":
-                        count2 += 1
-                        count += 1
+        #             if canna[0] in lis2  and canna[1]== "1":
+        #                 count2 += 1
+        #                 count += 1
                         
-                    # elif count==(n_2):
-                        perc = np.random.randint(50,71)
-                    #     user_queries.append([user[0],query_ID,str(perc/100)])
-                        perc2 += perc
+        #             # elif count==(n_2):
+        #                 perc = np.random.randint(50,71)
+        #             #     user_queries.append([user[0],query_ID,str(perc/100)])
+        #                 perc2 += perc
 
-                    if canna[0] in lis3  and canna[1]== "1":
-                        count3 += 1
-                        count += 1
+        #             if canna[0] in lis3  and canna[1]== "1":
+        #                 count3 += 1
+        #                 count += 1
                         
-                    # elif count==(n_3):
-                        perc = np.random.randint(5,31)
-                    #     user_queries.append([user[0],query_ID,str(perc/100)])
-                        perc3 += perc
+        #             # elif count==(n_3):
+        #                 perc = np.random.randint(5,31)
+        #             #     user_queries.append([user[0],query_ID,str(perc/100)])
+        #                 perc3 += perc
                    
-            if count>=6:
-                #perc = ((count1*perc1)+(count2*perc2)+(count3*perc3))/(count1+count2+count3)
-                #perc = round(perc, 2)
+        #     if count>=1:
+        #         #perc = ((count1*perc1)+(count2*perc2)+(count3*perc3))/(count1+count2+count3)
+        #         #perc = round(perc, 2)
 
-                perc = ((perc1*2.5)+(perc2*2)+(perc3*1.5))/((2.5*count1)+(2*count2)+(1.5*count3))
-                user_queries.append([user[0],query_ID,str(perc/100)])
+        #         perc = ((perc1*2.5)+(perc2*0.5)+(perc3*1.5))/((2.5*count1)+(0.5*count2)+(1.5*count3))
+        #         user_queries.append([user[0],query_ID,str(perc/100)])
 
             #print(count)
 
@@ -184,9 +275,7 @@ def create_query_log(users, queries_set,relational_table):
         
     #print("Ciao: ", len(ciao))
             #print("1: ", count1, "2: ", count2, "3: ", count3)
-    else:(
-        print("Frate guarda che hanno intersezione")
-    )
+    
     return user_queries
 
 
@@ -241,28 +330,11 @@ writer.writerow(attribute)
 f.close()
 
 
-relational_table = []
-
-with open("Relational_table.csv", "r") as q:
-    reader = csv.reader(q)
-    for row in reader:   
-        relational_table.append(row)
-        
-q.close()
-
-query_set = []
-with open("query_set.csv", "r") as q:
-    reader = csv.reader(q)
-    for row in reader:   
-        query_set.append(row)
-
-
-
 f = open('Relational_table.csv','a')
 writer = csv.writer(f)
 random_list_tags = []
 random_Cre_ID = []
-for j in range(1,20000):
+for j in range(1,50000):
     random_list_tags.clear()
     random_list_tags.append(str(j).zfill(4))
     #random_list_tags.append(names[j])
@@ -274,33 +346,52 @@ for j in range(1,20000):
         else:
             random_list_tags.append(get_random_creator_ID(names))
     
+    tt = np.random.randint(0,2)
+    rnd = np.random.randint(50,347)
+
     for i in range(0,396):
         # a = np.random.normal(loc=0.0, scale=1.0, size=None)
         # if(a>1):
         #     random_list_tags.append(1)
         # else:random_list_tags.append(0)
-        random_list_tags.append(random_hashtag_values())
+        
+        random_list_tags.append(random_hashtag_values(i,rnd,tt))
     
     writer.writerow(random_list_tags)
 
 
 f.close()
 
+
+relational_table = []
+
+with open("Relational_table.csv", "r") as q:
+    reader = csv.reader(q)
+    for row in reader:   
+        relational_table.append(row)
+        
+q.close()
+
 f = open('query_set.csv','w')
 writer = csv.writer(f)
-num_query = 20000
+num_query = 3000
 query = create_query(attribute,names,num_query)
-
-#print(query)
-# for query_ in query:
-#     print("PROVA GET ID QUERY: ", query_[1][0])
-
 for query_ in query:
     writer.writerow(query_)
 
-# for i in range(num_query):
-#     writer.writerow(query[i])
+
 f.close()
+
+query_set = []
+with open("query_set.csv", "r") as q:
+    reader = csv.reader(q)
+    for row in reader:   
+        query_set.append(row)
+
+
+
+
+
 
 user_num = 500
 f = open('users.csv','w')
