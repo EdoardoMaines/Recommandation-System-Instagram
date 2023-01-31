@@ -98,23 +98,18 @@ def liking_percentage(freq_vector, l1, l2):
     w1 = 3
     w2 = 0.5
     perc1,perc2 = 0,0
-    p = 0
-    n = 0
+    
     for j in l1:
         if j-2 in set(list_top[0]):
             perc1 += freq_vector[1][int(j)-2]
-            p += 1 
     for h in l2:
         if h-2 in set(list_top[0]):
             perc2 += freq_vector[1][int(h)-2]
-            n += 1
     if perc1 > 0 or perc2 > 0:
         perc = ((perc1*w1+perc2*w2)/(w1+w2))/(perc1+perc2)
     else:
         perc = 0.5
     id = freq_vector[0]
-    
-
     return perc,id
 
 
@@ -131,12 +126,7 @@ def from_query_to_frequency(queries):
     return frequency_vector
 
 
-
-
-#     return user_queries
-
 def create_query_log(users, queries_set,relational_table):
-
     list_index_hashtags = []
     for i in range(2, 398):
         list_index_hashtags.append(i)
@@ -147,15 +137,15 @@ def create_query_log(users, queries_set,relational_table):
 
     frequency_vector = from_query_to_frequency(queries_set)
     for user in users:        
-        lista1,lista3 = [],[],[]
+        list1,list2 = [],[],[]
 
         for j in range(0,len(list_positive_index)):
-            lista1.append(list_positive_index[j])
+            list1.append(list_positive_index[j])
         for j in range(0,len(list_negative_index)):
-            lista3.append(list_negative_index[j])
+            list2.append(list_negative_index[j])
 
         for i in range(len(frequency_vector)):
-            perc, q_ID = liking_percentage(frequency_vector[i], lista1, lista3)
+            perc, q_ID = liking_percentage(frequency_vector[i], list1, list2)
             user_queries.append([user[0],q_ID,str(round(perc,2))])    
     return user_queries
 
@@ -164,7 +154,6 @@ def extract_tags(path,tags):
     c = 0
     with open(path) as f:
         lines = f.readlines()
-        
         for raw in lines:
             word = str.split(raw)
             for i in word:
@@ -173,7 +162,6 @@ def extract_tags(path,tags):
                 c=c+1
     
 def extract_names(path,tags):
-    c = 0
     with open(path) as f:
         lines = f.readlines()
         
@@ -182,7 +170,7 @@ def extract_names(path,tags):
             for i in word:
                 i = str.replace(i,"@","")
                 tags.append(i)
-                c=c+1
+
 def get_random_creator_ID (names):
     num_rand = np.random.randint(0, 300)
     name = names[num_rand]
@@ -221,13 +209,10 @@ for j in range(1,50000):
             random_list_tags.append(names[j-301])
         else:
             random_list_tags.append(get_random_creator_ID(names))
-    
     tt = np.random.randint(0,2)
     rnd = np.random.randint(50,347)
-
     for i in range(0,396):
         random_list_tags.append(random_hashtag_values(i,rnd,tt))
-    
     writer.writerow(random_list_tags)
 f.close()
 
@@ -240,9 +225,6 @@ with open("Relational_table.csv", "r") as q:
 q.close()
 
 
-
-
-
 f = open('query_set.csv','w')
 writer = csv.writer(f)
 num_query = 1000
@@ -252,15 +234,11 @@ for query_ in query:
 f.close()
 
 
-
 query_set = []
 with open("query_set.csv", "r") as q:
     reader = csv.reader(q)
     for row in reader:   
         query_set.append(row)
-
-
-
 
 
 
@@ -280,15 +258,13 @@ with open("query_set.csv") as q:
         queries_id.append(row.split(",")[0])
 q.close()
 
+
 f = open('query_log.csv', 'w')
 writer = csv.writer(f)
-
-lista_bella = create_query_log(user_set, query_set, relational_table)
-np.random.shuffle(lista_bella)
-
-for i in range(0,len(lista_bella)):
-    writer.writerow(lista_bella[i])
-
+list_log = create_query_log(user_set, query_set, relational_table)
+np.random.shuffle(list_log)
+for i in range(0,len(list_log)):
+    writer.writerow(list_log[i])
 f.close()
 
 # close the file
